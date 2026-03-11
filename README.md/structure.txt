@@ -1,0 +1,11 @@
+app/
+ ├── controllers/
+ │     ├── journal_controller.py
+ │     ├── user_controller.py
+ │     └── auth_controller.py
+ │
+ ├── services/
+ │     ├── journal_service.py
+ │     ├── user_service.py
+ │     └── auth_service.py
+ 
