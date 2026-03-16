@@ -9,9 +9,14 @@ class Content(Base):
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     content = Column(Text, nullable=False)
-
-    parent_id = Column(Integer, ForeignKey("contents.id"), nullable=True)
-
     created_at = Column(DateTime, server_default=func.now())
 
-    parent = relationship("Content", remote_side=[id])
+
+class Posts(Base):
+    __tablename__ = "posts"
+
+    post_id=Column(Integer,primary_key=True,index=True)
+    title  =Column(Text, nullable=False)
+    content = Column(Text, nullable=False)
+    parent_id=Column(Integer,ForeignKey("contents.id"))
+

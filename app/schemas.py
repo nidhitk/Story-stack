@@ -1,7 +1,10 @@
 from pydantic import BaseModel
 from typing import Optional
 
-class ContentCreate(BaseModel):
+class ParentContent(BaseModel):
     title: str
     content: str
-    parent_id: Optional[int] = None
+
+class ChildContent(BaseModel):
+    title:str
+    content:str

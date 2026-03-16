@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.schemas import ContentCreate
+from app.schemas import ParentContent,ChildContent
 app=FastAPI()
 
 # @app.get("/item/{num}")
@@ -20,7 +20,7 @@ app=FastAPI()
 from app.database import SessionLocal, engine
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from app.models import Content
+from app.models import Content,Posts
 from app import models
 models.Base.metadata.create_all(bind=engine)
 
@@ -39,18 +39,27 @@ def get_db():
     finally:
         db.close()
 
-@app.post("/create/{journal_id}")
-def create(journal_id:int,journals:ContentCreate, db: Session = Depends(get_db)):
-    newrecord=Content(title=journals.title,
-                            content=journals.content,
-                             parent_id=journals.parent_id )
+@app.post("/createTitle")
+def create(ContentTitle:ParentContent, db: Session = Depends(get_db)):
+    newrecord=Content(title=ContentTitle.title,
+                            content=ContentTitle.content)
     db.add(newrecord)
     db.commit()
     db.refresh(newrecord)
 
     return newrecord
 
+@app.post("/createTitle/posts")
+def createposts(parent_id:int,ContentPosts:ChildContent,db:Session=Depends(get_db)):
+    newrecord=Posts(title=ContentPosts.title,content=ContentPosts.content,parent_id=parent_id)
+    db.add(newrecord)
+    db.commit()
+    db.refresh(newrecord)
+    return newrecord
+
+@app.get("/getallposts")
+def getposts(title_id:int,db:Session=Depends(get_db)):
+   return db.query(Posts).filter(Posts.parent_id==title_id).all()
 
 
- 
-
+    
