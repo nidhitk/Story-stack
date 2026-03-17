@@ -31,7 +31,6 @@ def health():
 
 
 
-
 def get_db():
     db = SessionLocal()
     try:
@@ -62,5 +61,30 @@ def getposts(title_id:int,db:Session=Depends(get_db)):
    return db.query(Posts).filter(Posts.parent_id==title_id).all()
 
 
+@app.put("/editTitle")
+def edittitle(title_id:int,updatedtitle:ParentContent,db:Session=Depends(get_db)):
+    titlecontent=db.query(Content).filter(Content.id==title_id).first()
+    if not titlecontent:
+        return {"error":"No title found"}
+    titlecontent.content=updatedtitle.content
+    db.commit()
+    db.refresh(titlecontent)
+    return titlecontent
 
-    
+
+@app.put("/editposts")
+def editposts(post_id:int,updatedPosts:ChildContent ,db:Session=Depends(get_db)):
+    childpost=db.query(Posts).filter(Posts.post_id==post_id).first()
+    if not childpost:
+        return{"error":"posts not found"}
+    childpost.content=updatedPosts.content
+    db.commit()
+    db.refresh(childpost)
+    return childpost
+
+
+
+
+
+
+
