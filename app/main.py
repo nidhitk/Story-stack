@@ -39,7 +39,7 @@ def get_db():
     finally:
         db.close()
 
-@app.post("/createTitle")
+@app.post("/Title")
 def create(ContentTitle:ParentContent, db: Session = Depends(get_db)):
     newrecord=Content(title=ContentTitle.title,
                             content=ContentTitle.content)
@@ -49,7 +49,7 @@ def create(ContentTitle:ParentContent, db: Session = Depends(get_db)):
 
     return newrecord
 
-@app.post("/createTitle/posts")
+@app.post("/posts")
 def createposts(parent_id:int,ContentPosts:ChildContent,db:Session=Depends(get_db)):
     newrecord=Posts(title=ContentPosts.title,content=ContentPosts.content,parent_id=parent_id)
     db.add(newrecord)
@@ -57,9 +57,10 @@ def createposts(parent_id:int,ContentPosts:ChildContent,db:Session=Depends(get_d
     db.refresh(newrecord)
     return newrecord
 
-@app.get("/getallposts")
+@app.get("/title/{titile_id}/posts")
 def getposts(title_id:int,db:Session=Depends(get_db)):
    return db.query(Posts).filter(Posts.parent_id==title_id).all()
+
 
 
     
