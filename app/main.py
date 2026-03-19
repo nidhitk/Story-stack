@@ -82,6 +82,36 @@ def editposts(post_id:int,updatedPosts:ChildContent ,db:Session=Depends(get_db))
     db.refresh(childpost)
     return childpost
 
+@app.delete("/deletecontent")
+def deletecontent(titile_id:int,forced_delete:bool,db:Session=Depends(get_db)):
+    titlecontent=db.query(Content).filter(Content.id==titile_id).first()
+    if not titlecontent:
+        return{"error":"Titile not found"}
+    postcontent=db.query(Posts).filter(Posts.parent_id==titile_id).first()
+    if not postcontent:
+        db.delete(titlecontent)
+        db.commit()
+        return{"Title delete success"}
+
+    if postcontent and forced_delete:
+        db.query(Posts).filter(Posts.parent_id==titile_id).delete()
+        db.delete(titlecontent)
+        db.commit()
+        return{"Title delete success from forced"}
+    return{"error":"post is present, manual post delete required"}
+
+@app.delete("/deletepost")
+def deletepost(post_id:int,db:Session=Depends(get_db)):
+    postcontent=db.query(Posts).filter(Posts.post_id==post_id).first()
+    if not postcontent:
+        return{"error":"post not found"}
+    db.delete(postcontent)
+    db.commit()
+    return {"suucess":"post deleted"}
+
+
+
+
 
 
 
