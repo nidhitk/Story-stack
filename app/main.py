@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.schemas import ParentContent,ChildContent
+from app.schemas import ParentContent,ChildContent,postupdate,titleupdate
 app=FastAPI()
 
 # @app.get("/item/{num}")
@@ -61,26 +61,33 @@ def getposts(title_id:int,db:Session=Depends(get_db)):
    return db.query(Posts).filter(Posts.parent_id==title_id).all()
 
 
-@app.put("/editTitle")
-def edittitle(title_id:int,updatedtitle:ParentContent,db:Session=Depends(get_db)):
+@app.patch("/editTitle")
+def edittitle(title_id:int,updatedtitle:titleupdate,db:Session=Depends(get_db)):
     titlecontent=db.query(Content).filter(Content.id==title_id).first()
     if not titlecontent:
         return {"error":"No title found"}
-    titlecontent.content=updatedtitle.content
+    if updatedtitle.title is not None:
+       titlecontent.title=updatedtitle.title
+    if updatedtitle.content is not None:
+        titlecontent.content=updatedtitle.content 
     db.commit()
     db.refresh(titlecontent)
     return titlecontent
 
 
-@app.put("/editposts")
-def editposts(post_id:int,updatedPosts:ChildContent ,db:Session=Depends(get_db)):
+@app.patch("/editposts")
+def editposts(post_id:int,updatedPosts: postupdate,db:Session=Depends(get_db)):
     childpost=db.query(Posts).filter(Posts.post_id==post_id).first()
     if not childpost:
         return{"error":"posts not found"}
-    childpost.content=updatedPosts.content
+    if updatedPosts.title is not None:
+        childpost.title=updatedPosts.title
+    if updatedPosts.content is not None:
+       childpost.content=updatedPosts.content   
     db.commit()
     db.refresh(childpost)
     return childpost
+
 
 @app.delete("/deletecontent")
 def deletecontent(titile_id:int,forced_delete:bool,db:Session=Depends(get_db)):
