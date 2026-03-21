@@ -38,9 +38,21 @@ def createposts(parent_id:int,ContentPosts:ChildContent,db:Session=Depends(get_d
     db.refresh(newrecord)
     return newrecord
 
-@app.get("/title/{titile_id}/posts")
-def getposts(title_id:int,db:Session=Depends(get_db)):
-   return db.query(Posts).filter(Posts.parent_id==title_id).all()
+# @app.get("/title/{titile_id}/posts")
+# def getposts(title_id:int,db:Session=Depends(get_db)):
+#    return db.query(Posts).filter(Posts.parent_id==title_id).all()
+
+@app.get("/titile/{titile_id}/allposts")
+def getallposts(titile_id:int,db:Session=Depends(get_db)):
+    title=db.query(Content).filter(Content.id==titile_id).first()
+    if not title:
+        return {"no title found"}
+    posts=db.query(Posts).filter(Posts.parent_id==titile_id).all()
+    return{
+        "titile":title,
+        "posts":posts
+    }
+    
 
 
 @app.patch("/editTitle")
@@ -97,6 +109,8 @@ def deletepost(post_id:int,db:Session=Depends(get_db)):
     db.delete(postcontent)
     db.commit()
     return {"suucess":"post deleted"}
+
+
 
 
 
