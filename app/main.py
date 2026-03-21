@@ -6,8 +6,18 @@ from sqlalchemy.orm import Session
 from app.models import Content,Posts
 from app import models
 models.Base.metadata.create_all(bind=engine)
-
+from fastapi.middleware.cors import CORSMiddleware
 app=FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 @app.get("/")
 def health():
     return {"health":"server is good"}
