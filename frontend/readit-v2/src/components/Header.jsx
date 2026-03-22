@@ -9,7 +9,7 @@
 export default function Header() {
   return (
     <header className="header">
-      <div className="header-logo">R</div>
+      <div className="header-logo">NTK</div>
       <div>
         <h1 className="header-title">Story<span>Stack</span></h1>
         <p className="header-subtitle">Community discussion board</p>
