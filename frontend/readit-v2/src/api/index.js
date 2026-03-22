@@ -6,6 +6,7 @@
 //  POST   /Title                          createTitle(title, content)
 //  POST   /posts?parent_id=ID             createPost(parentId, title, content)
 //  GET    /titile/:id/allposts            getTitleWithPosts(titleId)
+//  GET    /titles                         getAllTitles()
 //  PATCH  /editTitle?title_id=ID          editTitle(id, {title, content})
 //  PATCH  /editposts?post_id=ID           editPost(id, {title, content})
 //  DELETE /deletecontent?titile_id=ID     deleteTitle(id, forced)
@@ -96,4 +97,9 @@ export async function deletePost(postId) {
   return request(`/deletepost?post_id=${postId}`, {
     method: 'DELETE',
   });
+}
+
+// GET /titles — fetch all titles with their posts (used on page load)
+export async function getAllTitles() {
+  return request('/titles');
 }

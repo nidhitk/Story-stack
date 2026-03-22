@@ -7,16 +7,17 @@ from app.models import Content,Posts
 from app import models
 models.Base.metadata.create_all(bind=engine)
 from fastapi.middleware.cors import CORSMiddleware
+
 app=FastAPI()
-
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # allows all origins during development
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 
 @app.get("/")
 def health():
@@ -62,6 +63,20 @@ def getallposts(titile_id:int,db:Session=Depends(get_db)):
         "titile":title,
         "posts":posts
     }
+
+@app.get("/titles")
+def getalltitles(db: Session = Depends(get_db)):
+    titles = db.query(Content).all()
+    result = []
+    for title in titles:
+        posts = db.query(Posts).filter(Posts.parent_id == title.id).all()
+        result.append({
+            "id": title.id,
+            "title": title.title,
+            "content": title.content,
+            "posts": posts
+        })
+    return result   
     
 
 

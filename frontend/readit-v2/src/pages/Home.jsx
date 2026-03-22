@@ -17,8 +17,8 @@
 //   - You want to add a new section to the page
 //   - You want to add search or filters
 // ─────────────────────────────────────────────────────────────
-import { useState } from 'react';
-import { createTitle, createPost, deleteTitle, getTitleWithPosts } from '../api';
+import { useState,useEffect } from 'react';
+import { createTitle, createPost, deleteTitle, getTitleWithPosts,getAllTitles } from '../api';
 import TitleGroup  from '../components/TitleGroup';
 import DeleteModal from '../components/DeleteModal';
 
@@ -42,6 +42,25 @@ export default function Home({ toast }) {
   // ── Delete modal ──────────────────────────────────────────
   const [deleteTarget, setDeleteTarget] = useState(null);  // { id, title }
   const [deletingId,   setDeletingId]   = useState(null);
+  // ── Load all data from DB on page load / refresh ──────────
+  useEffect(() => {
+    const loadAll = async () => {
+      try {
+        const data = await getAllTitles();
+        setGroups(data.map(item => ({
+          id:      item.id,
+          title:   item.title,
+          content: item.content,
+          posts:   item.posts || [],
+        })));
+      } catch (e) {
+        toast(e.message, 'error');
+      }
+    };
+    loadAll();
+  }, []); // [] means run once when page first opens
+
+  
 
 
   // ── Helper: fetch posts for a title and update state ─────
