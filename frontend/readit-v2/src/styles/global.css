@@ -1,0 +1,63 @@
+/* ─────────────────────────────────────────────────────────────
+   global.css — Base styles & color variables
+   
+   ✏️  EDIT THIS FILE when:
+     - You want to change the color scheme
+     - You want to change fonts
+     - You need to update base element styles (input, button, etc.)
+   ───────────────────────────────────────────────────────────── */
+
+/* ── Color & design tokens ── */
+/* Change these to restyle the entire app */
+:root {
+  --bg:        #0d0d0f;   /* page background */
+  --surface:   #18181c;   /* card background */
+  --surface2:  #222228;   /* input / post card background */
+  --border:    #2e2e38;   /* borders */
+  --accent:    #ff4d00;   /* orange — brand color */
+  --accent2:   #ff8c42;   /* lighter orange — hover state */
+  --text:      #f0eff4;   /* main text */
+  --muted:     #8a8999;   /* secondary text, labels */
+  --green:     #3ddc97;   /* success */
+  --red:       #ff4466;   /* error / delete */
+
+  --radius:    12px;      /* card corner radius */
+  --shadow:    0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Base ── */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Form elements ── */
+input, textarea, select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  padding: 10px 14px;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent);
+}
+textarea { min-height: 80px; resize: vertical; }
+select option { background: var(--surface2); }
+
+/* ── Animations ── */
+@keyframes spin    { to { transform: rotate(360deg); } }
+@keyframes fadeIn  { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: none; } }

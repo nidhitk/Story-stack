@@ -1,0 +1,284 @@
+/* ─────────────────────────────────────────────────────────────
+   app.css — All component & layout styles
+   
+   ✏️  EDIT THIS FILE when:
+     - You want to change how a specific component looks
+     - You need to adjust spacing, sizing, or layout
+     - You're adding a new component and need styles for it
+   
+   HOW IT'S ORGANISED:
+     Each section is clearly labelled.
+     Search for the component name to jump to its styles.
+   ───────────────────────────────────────────────────────────── */
+
+
+/* ════════════════════════════════════════════
+   PAGE LAYOUT
+   ════════════════════════════════════════════ */
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 20px 80px;
+}
+
+
+/* ════════════════════════════════════════════
+   HEADER  (src/components/Header.jsx)
+   ════════════════════════════════════════════ */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 36px;
+}
+.header-logo {
+  width: 44px; height: 44px;
+  background: var(--accent);
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 20px; color: #fff;
+  flex-shrink: 0;
+}
+.header-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 1.65rem; letter-spacing: -0.02em;
+}
+.header-title span { color: var(--accent); }
+.header-subtitle { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+
+
+/* ════════════════════════════════════════════
+   CARD  (white box wrapper used by forms)
+   ════════════════════════════════════════════ */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.card-label {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.74rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 16px;
+}
+
+
+/* ════════════════════════════════════════════
+   BUTTONS  (used everywhere)
+   ════════════════════════════════════════════ */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px; border-radius: 8px; border: none;
+  font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 0.88rem;
+  cursor: pointer; transition: all 0.18s; white-space: nowrap;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--accent2); transform: translateY(-1px); }
+
+.btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.btn-ghost:hover:not(:disabled) { border-color: var(--muted); color: var(--text); }
+
+.btn-danger { background: transparent; border: 1px solid rgba(255,68,102,0.3); color: var(--red); }
+.btn-danger:hover:not(:disabled) { background: rgba(255,68,102,0.1); }
+
+.btn-green { background: var(--green); color: #0d0d0f; }
+.btn-green:hover:not(:disabled) { opacity: 0.85; }
+
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+
+
+/* ════════════════════════════════════════════
+   SPINNER  (loading indicator)
+   ════════════════════════════════════════════ */
+.spinner {
+  width: 15px; height: 15px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  display: inline-block; flex-shrink: 0;
+}
+.spinner-lg { width: 32px; height: 32px; border-width: 3px; }
+
+
+/* ════════════════════════════════════════════
+   FORM HELPERS  (used inside form cards)
+   ════════════════════════════════════════════ */
+.form-row {
+  display: flex; gap: 10px;
+  align-items: flex-end; flex-wrap: wrap;
+}
+.form-group { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 160px; }
+.form-group label { font-size: 0.78rem; color: var(--muted); font-weight: 500; letter-spacing: 0.04em; }
+
+
+/* ════════════════════════════════════════════
+   SECTION DIVIDER  ("── All Posts ──" line)
+   ════════════════════════════════════════════ */
+.divider {
+  display: flex; align-items: center; gap: 14px;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; color: var(--muted);
+  margin: 32px 0 24px;
+}
+.divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+
+/* ════════════════════════════════════════════
+   TITLE GROUP  (src/components/TitleGroup.jsx)
+   Each "r/TitleName" section with its posts
+   ════════════════════════════════════════════ */
+.title-group { margin-bottom: 32px; animation: fadeIn 0.3s ease; }
+
+.title-group-header {
+  display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap;
+  gap: 12px; margin-bottom: 12px;
+}
+.title-group-name {
+  display: flex; align-items: center; gap: 10px;
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem;
+}
+.title-group-badge {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 2px 10px;
+  font-size: 0.72rem; color: var(--muted);
+  font-family: 'DM Sans', sans-serif; font-weight: 400;
+}
+
+
+/* ════════════════════════════════════════════
+   POST CARD  (src/components/PostCard.jsx)
+   Individual post inside a title group
+   ════════════════════════════════════════════ */
+.post-card {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 16px 20px; margin-bottom: 10px;
+  transition: border-color 0.2s, transform 0.18s;
+  animation: fadeIn 0.25s ease;
+}
+.post-card:hover { border-color: #44444f; transform: translateY(-1px); }
+
+.post-content { font-size: 0.92rem; line-height: 1.7; margin-bottom: 12px; }
+
+.post-footer {
+  display: flex; align-items: center;
+  justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+.post-id { font-size: 0.72rem; color: var(--muted); }
+.post-actions { display: flex; gap: 6px; }
+
+/* Edit mode inside a post card */
+.post-edit-area { display: flex; flex-direction: column; gap: 8px; }
+.post-edit-actions { display: flex; gap: 8px; }
+
+
+/* ════════════════════════════════════════════
+   DELETE MODAL  (src/components/DeleteModal.jsx)
+   Confirmation popup for deleting a title
+   ════════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.72);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; z-index: 999;
+}
+.modal {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 28px; max-width: 420px; width: 100%;
+}
+.modal-title {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.15rem;
+  margin-bottom: 10px;
+}
+.modal-body { color: var(--muted); font-size: 0.88rem; line-height: 1.6; margin-bottom: 18px; }
+.modal-body strong { color: var(--text); }
+.modal-checkbox {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 0.85rem; cursor: pointer; margin-bottom: 22px; user-select: none;
+}
+.modal-checkbox input { width: auto; accent-color: var(--accent); cursor: pointer; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+
+/* ════════════════════════════════════════════
+   TOAST NOTIFICATIONS  (src/components/Toast.jsx)
+   Pop-up messages (success / error)
+   ════════════════════════════════════════════ */
+.toast-wrap {
+  position: fixed; top: 20px; right: 20px;
+  display: flex; flex-direction: column; gap: 10px; z-index: 9999;
+}
+.toast {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-left: 3px solid var(--green);
+  border-radius: 8px; padding: 12px 18px;
+  font-size: 0.85rem; max-width: 320px;
+  box-shadow: var(--shadow); animation: slideIn 0.25s ease;
+}
+.toast-error { border-left-color: var(--red); }
+
+
+/* ════════════════════════════════════════════
+   EMPTY / LOADING STATES
+   ════════════════════════════════════════════ */
+.state-box {
+  display: flex; flex-direction: column;
+  align-items: center; gap: 12px;
+  padding: 40px 0; color: var(--muted); font-size: 0.88rem; text-align: center;
+}
+.state-icon { font-size: 2rem; opacity: 0.4; }
+
+
+/* ════════════════════════════════════════════
+   RESPONSIVE — mobile adjustments
+   ════════════════════════════════════════════ */
+@media (max-width: 600px) {
+  .form-row               { flex-direction: column; }
+  .title-group-header     { flex-direction: column; align-items: flex-start; }
+  .modal                  { padding: 20px; }
+}
+
+
+/* ════════════════════════════════════════════
+   EXTRA STYLES (added for actual backend schema)
+   ════════════════════════════════════════════ */
+
+/* Post title (posts have their own title field) */
+.post-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+/* Title description (Content model has a content field) */
+.title-group-desc {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* "No posts yet" message inside an empty title */
+.no-posts {
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 12px 0 4px;
+}
+
+/* Warning inside delete modal */
+.modal-warning {
+  font-size: 0.82rem;
+  color: var(--yellow);
+  margin-top: -12px;
+  margin-bottom: 18px;
+}
