@@ -19,4 +19,16 @@ class Posts(Base):
     title  =Column(Text, nullable=False)
     content = Column(Text, nullable=False)
     parent_id=Column(Integer,ForeignKey("contents.id"))
+    owner_id = Column(Integer, ForeignKey("users.id"))
+    owner=relationship("User")
+    
+
+
+class User(Base):
+    __tablename__="users" 
+    id=Column(Integer,primary_key=True,index=True)
+    username = Column(String, unique=True)
+    email = Column(String, unique=True)
+    password = Column(String)
+
 
