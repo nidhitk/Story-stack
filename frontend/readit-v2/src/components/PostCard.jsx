@@ -16,7 +16,7 @@
 import { useState } from 'react';
 import { editPost, deletePost } from '../api';
 
-export default function PostCard({ post, onUpdated, onDeleted, toast }) {
+export default function PostCard({ post, onUpdated, onDeleted, toast, authToken }) {
   const [editing,  setEditing]  = useState(false);
   const [draftTitle,   setDraftTitle]   = useState(post.title   || '');
   const [draftContent, setDraftContent] = useState(post.content || '');
@@ -26,12 +26,16 @@ export default function PostCard({ post, onUpdated, onDeleted, toast }) {
   // ── Save edited post ──────────────────────────────────────
   const handleSave = async () => {
     if (!draftContent.trim()) return;
+    if (!authToken) {
+      toast('Log in before editing posts.', 'error');
+      return;
+    }
     setSaving(true);
     try {
       await editPost(post.post_id, {
         title:   draftTitle.trim()   || undefined,
         content: draftContent.trim() || undefined,
-      });
+      }, authToken);
       toast('Post updated!');
       onUpdated(post.post_id, draftTitle.trim(), draftContent.trim());
       setEditing(false);
@@ -45,9 +49,13 @@ export default function PostCard({ post, onUpdated, onDeleted, toast }) {
   // ── Delete this post ──────────────────────────────────────
   const handleDelete = async () => {
     if (!window.confirm('Delete this post?')) return;
+    if (!authToken) {
+      toast('Log in before deleting posts.', 'error');
+      return;
+    }
     setDeleting(true);
     try {
-      await deletePost(post.post_id);
+      await deletePost(post.post_id, authToken);
       toast('Post deleted!');
       onDeleted(post.post_id);
     } catch (e) {
@@ -105,10 +113,10 @@ export default function PostCard({ post, onUpdated, onDeleted, toast }) {
           <div className="post-footer">
             <span className="post-id">post #{post.post_id}</span>
             <div className="post-actions">
-              <button className="btn btn-ghost btn-sm" onClick={() => setEditing(true)}>
+              <button className="btn btn-ghost btn-sm" onClick={() => setEditing(true)} disabled={!authToken}>
                 ✏ Edit
               </button>
-              <button className="btn btn-danger btn-sm" onClick={handleDelete} disabled={deleting}>
+              <button className="btn btn-danger btn-sm" onClick={handleDelete} disabled={deleting || !authToken}>
                 {deleting ? <span className="spinner" /> : '🗑'}
               </button>
             </div>

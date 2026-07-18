@@ -20,11 +20,39 @@
 
 import BASE_URL from '../config';
 
+const ACCESS_TOKEN_KEY = 'storystack_access_token';
+const REFRESH_TOKEN_KEY = 'storystack_refresh_token';
+
+export function getStoredToken() {
+  return localStorage.getItem(ACCESS_TOKEN_KEY);
+}
+
+export function getStoredRefreshToken() {
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
+}
+
+export function storeToken(accessToken, refreshToken = null) {
+  localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+  if (refreshToken) {
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+  }
+}
+
+export function clearStoredToken() {
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+}
+
 // ── Internal helper (don't export this) ──────────────────────
 async function request(path, options = {}) {
+  const { authToken, headers, ...fetchOptions } = options;
   const response = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      ...headers,
+    },
+    ...fetchOptions,
   });
 
   if (!response.ok) {
@@ -37,6 +65,38 @@ async function request(path, options = {}) {
 
 
 // ── TITLES ────────────────────────────────────────────────────
+
+export async function loginUser(username, password) {
+  const body = new URLSearchParams();
+  body.set('username', username);
+  body.set('password', password);
+
+  const response = await fetch(`${BASE_URL}/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err.detail || `Error ${response.status}`);
+  }
+
+  return response.json();
+}
+
+export async function registerUser(username, email, password) {
+  const data = await request('/register', {
+    method: 'POST',
+    body: JSON.stringify({ username, email, password }),
+  });
+
+  if (data?.message && data.message !== 'user created') {
+    throw new Error(data.message);
+  }
+
+  return data;
+}
 
 // POST /Title
 // Your backend schema: ParentContent { title, content }
@@ -76,26 +136,29 @@ export async function deleteTitle(titleId, forced = false) {
 
 // POST /posts?parent_id=ID
 // Your backend schema: ChildContent { title, content }
-export async function createPost(parentId, title, content) {
+export async function createPost(parentId, title, content, authToken) {
   return request(`/posts?parent_id=${parentId}`, {
     method: 'POST',
+    authToken,
     body: JSON.stringify({ title, content }),
   });
 }
 
 // PATCH /editposts?post_id=ID
 // Your backend schema: postupdate { title?, content? }
-export async function editPost(postId, { title, content }) {
+export async function editPost(postId, { title, content }, authToken) {
   return request(`/editposts?post_id=${postId}`, {
     method: 'PATCH',
+    authToken,
     body: JSON.stringify({ title, content }),
   });
 }
 
 // DELETE /deletepost?post_id=ID
-export async function deletePost(postId) {
+export async function deletePost(postId, authToken) {
   return request(`/deletepost?post_id=${postId}`, {
     method: 'DELETE',
+    authToken,
   });
 }
 

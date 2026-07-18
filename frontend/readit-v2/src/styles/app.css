@@ -21,6 +21,61 @@
   padding: 0 20px 80px;
 }
 
+.login-shell {
+  min-height: calc(100vh - 80px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 420px);
+  gap: 28px;
+  align-items: center;
+  padding: 28px 0 60px;
+}
+
+.login-hero {
+  padding-right: 12px;
+}
+
+.login-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.login-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.75rem;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  max-width: 13ch;
+}
+
+.login-copy {
+  max-width: 56ch;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.login-card {
+  margin-bottom: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.login-submit {
+  justify-content: center;
+  margin-top: 4px;
+}
+
 
 /* ════════════════════════════════════════════
    HEADER  (src/components/Header.jsx)
@@ -32,6 +87,10 @@
   padding: 28px 0;
   border-bottom: 1px solid var(--border);
   margin-bottom: 36px;
+}
+.header-copy {
+  flex: 1;
+  min-width: 0;
 }
 .header-logo {
   width: 44px; height: 44px;
@@ -48,6 +107,9 @@
 }
 .header-title span { color: var(--accent); }
 .header-subtitle { color: var(--muted); font-size: 0.82rem; margin-top: 2px; }
+.header-action {
+  flex-shrink: 0;
+}
 
 
 /* ════════════════════════════════════════════
@@ -66,6 +128,43 @@
   font-size: 0.74rem; font-weight: 700;
   letter-spacing: 0.12em; text-transform: uppercase;
   color: var(--accent); margin-bottom: 16px;
+}
+
+.auth-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+.auth-hint {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+.auth-form {
+  flex: 1;
+  min-width: 0;
+}
+.auth-tabs {
+  display: inline-flex;
+  padding: 3px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface2);
+}
+.auth-tab {
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 6px 12px;
+}
+.auth-tab.active {
+  background: var(--accent);
+  color: #fff;
 }
 
 
@@ -243,8 +342,13 @@
    ════════════════════════════════════════════ */
 @media (max-width: 600px) {
   .form-row               { flex-direction: column; }
+  .auth-card              { flex-direction: column; }
   .title-group-header     { flex-direction: column; align-items: flex-start; }
   .modal                  { padding: 20px; }
+  .login-shell            { grid-template-columns: 1fr; min-height: auto; padding-top: 0; }
+  .login-title            { font-size: 2.2rem; max-width: 100%; }
+  .header                 { flex-wrap: wrap; }
+  .header-action          { width: 100%; justify-content: center; }
 }
 
 

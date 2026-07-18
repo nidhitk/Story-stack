@@ -1,183 +1,146 @@
-// ─────────────────────────────────────────────────────────────
-// pages/Home.jsx — Main page
-//
-// HOW DATA FLOWS IN YOUR BACKEND:
-//
-//   1. You create a Title  → POST /Title  { title, content }
-//   2. You create a Post   → POST /posts?parent_id=ID  { title, content }
-//   3. To see everything   → GET /titile/:id/allposts  per title
-//
-// Because your backend has no "get ALL titles" or "get ALL posts"
-// endpoint, this page:
-//   - Keeps a local list of titles (added during the session)
-//   - Fetches posts per title when a title is added or on load
-//   - Stores everything in local state
-//
-// ✏️  EDIT THIS FILE when:
-//   - You want to add a new section to the page
-//   - You want to add search or filters
-// ─────────────────────────────────────────────────────────────
-import { useState,useEffect } from 'react';
-import { createTitle, createPost, deleteTitle, getTitleWithPosts,getAllTitles } from '../api';
-import TitleGroup  from '../components/TitleGroup';
+import { useEffect, useState } from 'react';
+import {
+  createTitle,
+  createPost,
+  deleteTitle,
+  getAllTitles,
+  getTitleWithPosts,
+} from '../api';
+import TitleGroup from '../components/TitleGroup';
 import DeleteModal from '../components/DeleteModal';
 
-export default function Home({ toast }) {
-
-  // ── All titles with their posts ───────────────────────────
-  // Shape: [{ id, title, content, posts: [] }]
+export default function Home({ toast, authToken }) {
   const [groups, setGroups] = useState([]);
-
-  // ── "Create Title" form ───────────────────────────────────
-  const [newTitleName,    setNewTitleName]    = useState('');
+  const [newTitleName, setNewTitleName] = useState('');
   const [newTitleContent, setNewTitleContent] = useState('');
-  const [addingTitle,     setAddingTitle]     = useState(false);
+  const [addingTitle, setAddingTitle] = useState(false);
+  const [postParentId, setPostParentId] = useState('');
+  const [postTitle, setPostTitle] = useState('');
+  const [postContent, setPostContent] = useState('');
+  const [addingPost, setAddingPost] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
-  // ── "Create Post" form ────────────────────────────────────
-  const [postParentId,  setPostParentId]  = useState('');
-  const [postTitle,     setPostTitle]     = useState('');
-  const [postContent,   setPostContent]   = useState('');
-  const [addingPost,    setAddingPost]    = useState(false);
-
-  // ── Delete modal ──────────────────────────────────────────
-  const [deleteTarget, setDeleteTarget] = useState(null);  // { id, title }
-  const [deletingId,   setDeletingId]   = useState(null);
-  // ── Load all data from DB on page load / refresh ──────────
   useEffect(() => {
     const loadAll = async () => {
       try {
         const data = await getAllTitles();
         setGroups(data.map(item => ({
-          id:      item.id,
-          title:   item.title,
+          id: item.id,
+          title: item.title,
           content: item.content,
-          posts:   item.posts || [],
+          posts: item.posts || [],
         })));
-      } catch (e) {
-        toast(e.message, 'error');
+      } catch (error) {
+        toast(error.message, 'error');
       }
     };
+
     loadAll();
-  }, []); // [] means run once when page first opens
+  }, [toast]);
 
-  
-
-
-  // ── Helper: fetch posts for a title and update state ─────
-  const loadTitlePosts = async (titleId) => {
+  const loadTitlePosts = async titleId => {
     try {
       const data = await getTitleWithPosts(titleId);
-      // data = { titile: { id, title, content }, posts: [...] }
       setGroups(prev => {
-        const exists = prev.find(g => g.id === titleId);
         const updated = {
-          id:      data.titile.id,
-          title:   data.titile.title,
+          id: data.titile.id,
+          title: data.titile.title,
           content: data.titile.content,
-          posts:   data.posts || [],
+          posts: data.posts || [],
         };
-        if (exists) return prev.map(g => g.id === titleId ? updated : g);
-        return [...prev, updated];
+        const exists = prev.some(group => group.id === titleId);
+        return exists
+          ? prev.map(group => (group.id === titleId ? updated : group))
+          : [...prev, updated];
       });
-    } catch (e) {
-      toast(e.message, 'error');
+    } catch (error) {
+      toast(error.message, 'error');
     }
   };
 
-
-  // ── Create a new title ────────────────────────────────────
   const handleAddTitle = async () => {
     if (!newTitleName.trim()) return;
+
     setAddingTitle(true);
     try {
       const created = await createTitle(newTitleName.trim(), newTitleContent.trim());
-      // Add it to our groups list with empty posts
-      setGroups(prev => [...prev, {
-        id:      created.id,
-        title:   created.title,
-        content: created.content,
-        posts:   [],
-      }]);
+      setGroups(prev => [...prev, { ...created, posts: [] }]);
       toast(`Title "${created.title}" created!`);
       setNewTitleName('');
       setNewTitleContent('');
-    } catch (e) {
-      toast(e.message, 'error');
+    } catch (error) {
+      toast(error.message, 'error');
     } finally {
       setAddingTitle(false);
     }
   };
 
-
-  // ── Create a new post ─────────────────────────────────────
   const handleAddPost = async () => {
     if (!postParentId || !postContent.trim()) return;
+    if (!authToken) {
+      toast('Log in before creating a post.', 'error');
+      return;
+    }
+
     setAddingPost(true);
     try {
       const created = await createPost(
         Number(postParentId),
         postTitle.trim(),
-        postContent.trim()
+        postContent.trim(),
+        authToken
       );
-      // Add new post directly into the right group (no refetch needed)
-      setGroups(prev => prev.map(g =>
-        g.id === Number(postParentId)
-          ? { ...g, posts: [...g.posts, created] }
-          : g
+
+      setGroups(prev => prev.map(group =>
+        group.id === Number(postParentId)
+          ? { ...group, posts: [...group.posts, created] }
+          : group
       ));
       toast('Post published!');
       setPostTitle('');
       setPostContent('');
-    } catch (e) {
-      toast(e.message, 'error');
+    } catch (error) {
+      toast(error.message, 'error');
     } finally {
       setAddingPost(false);
     }
   };
 
-
-  // ── Delete a title ────────────────────────────────────────
-  const handleDeleteConfirm = async (forced) => {
+  const handleDeleteConfirm = async forced => {
     setDeletingId(deleteTarget.id);
     try {
       await deleteTitle(deleteTarget.id, forced);
-      setGroups(prev => prev.filter(g => g.id !== deleteTarget.id));
+      setGroups(prev => prev.filter(group => group.id !== deleteTarget.id));
       toast(`"${deleteTarget.title}" deleted!`);
       setDeleteTarget(null);
-    } catch (e) {
-      toast(e.message, 'error');
+    } catch (error) {
+      toast(error.message, 'error');
     } finally {
       setDeletingId(null);
     }
   };
 
-
-  // ── Optimistic post update (no refetch) ───────────────────
   const handlePostUpdated = (postId, newTitle, newContent) => {
-    setGroups(prev => prev.map(g => ({
-      ...g,
-      posts: g.posts.map(p =>
-        p.post_id === postId
-          ? { ...p, title: newTitle, content: newContent }
-          : p
+    setGroups(prev => prev.map(group => ({
+      ...group,
+      posts: group.posts.map(post =>
+        post.post_id === postId
+          ? { ...post, title: newTitle, content: newContent }
+          : post
       ),
     })));
   };
 
-
-  // ── Optimistic post delete (no refetch) ──────────────────
-  const handlePostDeleted = (postId) => {
-    setGroups(prev => prev.map(g => ({
-      ...g,
-      posts: g.posts.filter(p => p.post_id !== postId),
+  const handlePostDeleted = postId => {
+    setGroups(prev => prev.map(group => ({
+      ...group,
+      posts: group.posts.filter(post => post.post_id !== postId),
     })));
   };
 
-
-  // ── Render ────────────────────────────────────────────────
   return (
     <>
-      {/* Delete confirmation modal */}
       {deleteTarget && (
         <DeleteModal
           titleName={deleteTarget.title}
@@ -187,7 +150,6 @@ export default function Home({ toast }) {
         />
       )}
 
-      {/* ══ CREATE TITLE FORM ══════════════════════════════ */}
       <div className="card">
         <p className="card-label">New Title</p>
 
@@ -198,9 +160,9 @@ export default function Home({ toast }) {
               id="title-name"
               type="text"
               value={newTitleName}
-              placeholder="e.g. Gaming, Science, News…"
-              onChange={e => setNewTitleName(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleAddTitle()}
+              placeholder="e.g. Gaming, Science, News..."
+              onChange={event => setNewTitleName(event.target.value)}
+              onKeyDown={event => event.key === 'Enter' && handleAddTitle()}
               disabled={addingTitle}
             />
           </div>
@@ -212,8 +174,8 @@ export default function Home({ toast }) {
             id="title-content"
             type="text"
             value={newTitleContent}
-            placeholder="A short description of this community…"
-            onChange={e => setNewTitleContent(e.target.value)}
+            placeholder="A short description of this community..."
+            onChange={event => setNewTitleContent(event.target.value)}
             disabled={addingTitle}
           />
         </div>
@@ -224,12 +186,10 @@ export default function Home({ toast }) {
           disabled={addingTitle || !newTitleName.trim()}
         >
           {addingTitle && <span className="spinner" />}
-          {addingTitle ? 'Creating…' : '+ Create Title'}
+          {addingTitle ? 'Creating...' : '+ Create Title'}
         </button>
       </div>
 
-
-      {/* ══ CREATE POST FORM ════════════════════════════════ */}
       <div className="card">
         <p className="card-label">New Post</p>
 
@@ -239,12 +199,12 @@ export default function Home({ toast }) {
             <select
               id="post-parent"
               value={postParentId}
-              onChange={e => setPostParentId(e.target.value)}
-              disabled={addingPost}
+              onChange={event => setPostParentId(event.target.value)}
+              disabled={addingPost || !authToken}
             >
-              <option value="">— select a title —</option>
-              {groups.map(g => (
-                <option key={g.id} value={g.id}>{g.title}</option>
+              <option value="">- select a title -</option>
+              {groups.map(group => (
+                <option key={group.id} value={group.id}>{group.title}</option>
               ))}
             </select>
           </div>
@@ -255,9 +215,9 @@ export default function Home({ toast }) {
               id="post-title"
               type="text"
               value={postTitle}
-              placeholder="Give your post a title…"
-              onChange={e => setPostTitle(e.target.value)}
-              disabled={addingPost}
+              placeholder="Give your post a title..."
+              onChange={event => setPostTitle(event.target.value)}
+              disabled={addingPost || !authToken}
             />
           </div>
         </div>
@@ -267,30 +227,28 @@ export default function Home({ toast }) {
           <textarea
             id="post-content"
             value={postContent}
-            placeholder="What's on your mind?"
-            onChange={e => setPostContent(e.target.value)}
-            disabled={addingPost}
+            placeholder={authToken ? "What's on your mind?" : 'Log in to write a post'}
+            onChange={event => setPostContent(event.target.value)}
+            disabled={addingPost || !authToken}
           />
         </div>
 
         <button
           className="btn btn-primary"
           onClick={handleAddPost}
-          disabled={addingPost || !postParentId || !postContent.trim()}
+          disabled={addingPost || !authToken || !postParentId || !postContent.trim()}
         >
           {addingPost && <span className="spinner" />}
-          {addingPost ? 'Posting…' : 'Post'}
+          {addingPost ? 'Posting...' : 'Post'}
         </button>
       </div>
 
-
-      {/* ══ TITLES & POSTS FEED ═════════════════════════════ */}
       <div className="divider">All Titles & Posts</div>
 
       {groups.length === 0 ? (
         <div className="state-box">
           <span className="state-icon">📭</span>
-          <span>No titles yet — create one above to get started!</span>
+          <span>No titles yet - create one above to get started!</span>
         </div>
       ) : (
         groups.map(group => (
@@ -302,6 +260,8 @@ export default function Home({ toast }) {
             onPostDeleted={handlePostDeleted}
             deletingId={deletingId}
             toast={toast}
+            authToken={authToken}
+            onRefreshTitle={loadTitlePosts}
           />
         ))
       )}

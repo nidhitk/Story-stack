@@ -25,6 +25,7 @@ export default function TitleGroup({
   onPostDeleted,
   deletingId,
   toast,
+  authToken,
 }) {
   const isDeleting = deletingId === group.id;
 
@@ -67,6 +68,7 @@ export default function TitleGroup({
             onUpdated={onPostUpdated}
             onDeleted={onPostDeleted}
             toast={toast}
+            authToken={authToken}
           />
         ))
       )}
