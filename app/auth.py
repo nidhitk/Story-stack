@@ -2,6 +2,10 @@ from passlib.context import CryptContext
 from fastapi import Depends,HTTPException
 from sqlalchemy.orm import Session
 from app.models import User
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -14,8 +18,11 @@ def verify_password(plain, hashed):
 from jose import JWTError,jwt
 from datetime import datetime, timedelta
 
-SECRET_KEY = "nidhisecret"
-ALGORITHM = "HS256"
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY is not set in the environment")
 
 from fastapi.security import OAuth2PasswordBearer
 

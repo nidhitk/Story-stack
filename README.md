@@ -42,6 +42,8 @@ Create a `.env` file in the project root:
 
 ```env
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/storystack_db"
+SECRET_KEY="change-this-to-a-long-random-secret"
+ALGORITHM="HS256"
 ```
 
 Start the backend:
